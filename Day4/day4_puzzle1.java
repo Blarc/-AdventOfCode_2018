@@ -3,6 +3,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -14,11 +15,11 @@ public class day4_puzzle1 {
 		int day;
 		int hour;
 		int minute;
-		String[] msg;
+		String msg;
 		
 		Event next;
 		
-		public Event (int month, int day, int hour, int minute, String[] msg) {
+		public Event (int month, int day, int hour, int minute, String msg) {
 			this.month = month;
 			this.day = day;
 			this.hour = hour;
@@ -26,7 +27,7 @@ public class day4_puzzle1 {
 			this.msg = msg;
 		}
 		
-		public Event (int month, int day, int hour, int minute, String[] msg, Event next) {
+		public Event (int month, int day, int hour, int minute, String msg, Event next) {
 			this.month = month;
 			this.day = day;
 			this.hour = hour;
@@ -85,10 +86,10 @@ public class day4_puzzle1 {
 		Pattern p = Pattern.compile("\\d+");
 		Matcher m;
 		
-		Event first = new Event(0, 0, 0, 0, "0 0".split(" "));
+		Event first = new Event(0, 0, 0, 0, "0 0");
 		String readLine;
 		for (int i = 0; (readLine = br.readLine()) != null; i++) {
-			System.out.println(i);
+			//System.out.println(i);
 			List<String> allMatches = new ArrayList<String>();
 			m = p.matcher(readLine);
 			while (m.find()) {
@@ -100,7 +101,7 @@ public class day4_puzzle1 {
 			int hour = Integer.parseInt(allMatches.get(3));
 			int minute = Integer.parseInt(allMatches.get(4));
 			
-			Event newEvent = new Event(month, day, hour, minute, readLine.split(" "));
+			Event newEvent = new Event(month, day, hour, minute, readLine);
 			
 			Event temp = first;
 			
@@ -108,7 +109,45 @@ public class day4_puzzle1 {
 				if (temp.next.isLessThan(newEvent)) {
 					temp = temp.next;
 				}
+				else {
+					break;
+				}
 			}
+			
+			newEvent.next = temp.next;
+			temp.next = newEvent;
+			
+			
 		}
+		
+		int guardId = 0;
+		int[] startSleep = new int[2];
+		
+		int max = Integer.MIN_VALUE;
+		int sleepiestId = -1;
+		
+		Event temp = first.next;
+		while (temp != null) {
+			System.out.println(temp.msg);
+			
+			String[] msgSplit = temp.msg.split(" ");
+			if (msgSplit[2].equals("Guard")) {
+				guardId = Integer.parseInt(msgSplit[3].split("#")[1]);
+			}
+			
+			else if (msgSplit[2].equals("falls")) {
+				startSleep[0] = temp.hour;
+				startSleep[1] = temp.minute;
+			}
+			
+			else if (msgSplit[2].equals("wakes")) {
+				int timeSlept = (temp.hour * 60 + temp.minute) - (startSleep[0] * 60 + startSleep[1])-1;
+			}
+			//System.out.println(temp.msg.split(" ")[2]);
+			temp = temp.next;
+		}
+		
+		System.out.println(sleepiestId + " " + max);
+		System.out.println(sleepiestId * max);
 	}
 }
