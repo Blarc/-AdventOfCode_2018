@@ -122,9 +122,8 @@ public class day4_puzzle1 {
 		
 		int guardId = 0;
 		int[] startSleep = new int[2];
-		
-		int max = Integer.MIN_VALUE;
-		int sleepiestId = -1;
+		int[][] guardRes = new int[4000][2];
+
 		
 		Event temp = first.next;
 		while (temp != null) {
@@ -142,12 +141,28 @@ public class day4_puzzle1 {
 			
 			else if (msgSplit[2].equals("wakes")) {
 				int timeSlept = (temp.hour * 60 + temp.minute) - (startSleep[0] * 60 + startSleep[1])-1;
+				guardRes[guardId][0] += timeSlept;
+				if (guardRes[guardId][1] == 0 || guardRes[guardId][1] < timeSlept) {
+					guardRes[guardId][1] = timeSlept;
+				}
 			}
 			//System.out.println(temp.msg.split(" ")[2]);
 			temp = temp.next;
 		}
+		int max = -1;
+		int bestId = 0;
 		
-		System.out.println(sleepiestId + " " + max);
-		System.out.println(sleepiestId * max);
+		for (int i = 0; i < guardRes.length; i++) {
+			if (guardRes[i][0] > 0) {
+				System.out.println(i + " " + guardRes[i][0] + guardRes[i][1]);
+			}
+			if (guardRes[i][0] > max) {
+				max = guardRes[i][0];
+				bestId = i;
+			}
+		}
+		
+		System.out.println(bestId + " " + guardRes[bestId][1]);
+		System.out.println(bestId * guardRes[bestId][1]);
 	}
 }
