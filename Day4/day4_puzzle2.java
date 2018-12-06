@@ -8,7 +8,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class day4_puzzle1 {
+
+public class day4_puzzle2 {
 	
 	public static class Event {
 		int month;
@@ -81,8 +82,6 @@ public class day4_puzzle1 {
 		
 		BufferedReader br = new BufferedReader(new FileReader(args[0]));
 		
-		Event[] events = new Event[1128];
-		
 		Pattern p = Pattern.compile("\\d+");
 		Matcher m;
 		
@@ -122,12 +121,11 @@ public class day4_puzzle1 {
 		
 		int guardId = 0;
 		int[] startSleep = new int[2];
-		int[][] guardRes = new int[4000][2];
+		int[][] guardRes = new int[4000][60];
 
-		
 		Event temp = first.next;
 		while (temp != null) {
-			//System.out.println(temp.msg);
+			System.out.println(temp.msg);
 			
 			String[] msgSplit = temp.msg.split(" ");
 			if (msgSplit[2].equals("Guard")) {
@@ -140,70 +138,33 @@ public class day4_puzzle1 {
 			}
 			
 			else if (msgSplit[2].equals("wakes")) {
-				int timeSlept = (temp.hour * 60 + temp.minute) - (startSleep[0] * 60 + startSleep[1])-1;
-				//System.out.println(timeSlept);
-				guardRes[guardId][0] += timeSlept;
-				if (guardRes[guardId][1] == 0 || guardRes[guardId][1] < timeSlept) {
-					guardRes[guardId][1] = timeSlept;
+				int timeSlept = (temp.hour * 60 + temp.minute) - (startSleep[0] * 60 + startSleep[1]);
+				for (int i = startSleep[1]; i < startSleep[1] + timeSlept; i++) {
+					guardRes[guardId][i]++;
 				}
+				
 			}
 			//System.out.println(temp.msg.split(" ")[2]);
 			temp = temp.next;
 		}
 		
-		int max = -1;
-		int bestId = 0;
+		
 		
 		for (int i = 0; i < guardRes.length; i++) {
-			if (guardRes[i][0] > max) {
-				max = guardRes[i][0];
-				bestId = i;
-			}
-		}
-		
-		System.out.println(bestId);
-		
-		int[] sleepCount = new int[60];
-		int startSleeping = 0;
-		
-		temp = first.next;
-		while (temp != null) {
-			
-			String[] msgSplit = temp.msg.split(" ");
-			if (msgSplit[2].equals("Guard")) {
-				guardId = Integer.parseInt(msgSplit[3].split("#")[1]);
-			}
-			
-			if (guardId == bestId) {
-				//System.out.println(temp.msg);
-				
-				if (msgSplit[2].equals("falls")) {
-					startSleep[0] = temp.hour;
-					startSleep[1] = temp.minute;
-				}
-				
-				else if (msgSplit[2].equals("wakes")) {
-					//System.out.println(startSleep[1]);
-					int timeSlept = (temp.hour * 60 + temp.minute) - (startSleep[0] * 60 + startSleep[1]);
-					//System.out.println(timeSlept);
-					for (int i = startSleep[1]; i < startSleep[1] + timeSlept; i++) {
-						sleepCount[i]++;
-					}
+			int max = -1;
+			int bestId = -1;
+			for (int j = 0; j < guardRes[i].length; j++) {
+				if (guardRes[i][j] > max) {
+					max = guardRes[i][j];
+					bestId = j;
 				}
 			}
-			temp = temp.next;
-		}
-		
-		max = -1;
-		int bestIndex = -1;
-		for (int i = 0; i < sleepCount.length; i++) {
-			if (sleepCount[i] > max) {
-				max = sleepCount[i];
-				bestIndex = i;
+			
+			if (bestId > 0) {
+				//System.out.println(Arrays.toString(guardRes[i]));
+				System.out.println(i + " " + bestId + " " + max);
 			}
+			
 		}
-		
-		System.out.println(bestIndex);
-		System.out.println(bestId * bestIndex);
 	}
 }
